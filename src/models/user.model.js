@@ -39,8 +39,9 @@ const getByUsername = async (username) => {
 
 const getById = async (id) => {
     const [rows] = await pool.query(`
-        SELECT * FROM users WHERE id = ?
-        INNER JOIN roles ON users.role_id = roles.id
+        SELECT u.*, roles.name as role_name FROM users u
+        LEFT JOIN roles ON u.role_id = roles.id
+        WHERE u.id = ?
         `, [id])
         
     return rows[0]

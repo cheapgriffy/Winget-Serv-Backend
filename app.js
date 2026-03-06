@@ -29,7 +29,7 @@ const DEBUG_DATA = [
 ]
 
 app.use("/user", userRoute)
-app.use("/inst", scriptRoute)
+app.use("/script", scriptRoute)
 
 
 app.listen(PORT, () => {

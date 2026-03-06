@@ -74,7 +74,7 @@ const removeUser = async (req, res, next) => {
         }
 
         const current_user = await userModel.getById(req.userId)
-        if(current_user.id != remove_request.id && current_user.role_id != "admin"){
+        if(current_user.id != remove_request.id && current_user.role_name != "admin"){
             return res.status(403).json({
                 error: "Forbidden",
                 message: "You are not allowed to remove this user"
@@ -155,7 +155,7 @@ const getMe = async (req, res, next) => {
         return res.status(200).json({user})
     }catch(err){
         console.log(err)
-        next()
+        next(err)
     }
 }
 

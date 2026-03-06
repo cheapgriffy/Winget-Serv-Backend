@@ -1,6 +1,8 @@
 const router = require("express").Router()
 const scriptsController = require("../controllers/scripts.controller")
+const auth = require("../middlewares/auth")
 
+router.post('/create', auth, scriptsController.createScript)
 
 router.get('/:user_id/:script_id', (req, res) => {
 

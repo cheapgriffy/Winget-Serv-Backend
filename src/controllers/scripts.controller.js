@@ -1,3 +1,5 @@
+const scriptModel = require("../models/script.model")
+
 // This contain all "caution sign" that will be broadcasted to terminal
 const terminal_output_header = {
     error: `echo "\x1b[31m
@@ -65,4 +67,30 @@ function sendProcessing(content, header = undefined, res, req){
     }
 }
 
-module.exports = { sendProcessing }
+const createScript = async (req, res, next) => {
+    const user_id = res.userId
+    const { name, description, content } = req.body
+
+    try{
+        if (!name || !description || !content){
+            return res.status(400).json({
+                error: "Bad request",
+                message: "A provided field is blank"
+            })
+        }
+        if(!user_id){
+            return res.status(400).json({
+                error: "Bad request",
+                message: "You are not logged in, or does not have permission to do this action"
+            })
+        }
+
+        const script_response = await scriptModel.addScript(user_id, name, description, content)
+        res.status(200).json(script_response)
+    } catch(err){
+        console.log(err)
+        next(err)
+    }
+}
+
+module.exports = { sendProcessing, createScript }

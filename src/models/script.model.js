@@ -1,0 +1,28 @@
+const pool = require("../config/db")
+const { nanoid } = require("nanoid")
+
+/**
+ * add script to database.
+ * @param {Int} user_id 
+ * @param {string} name 
+ * @param {string} description 
+ * @param {json} content 
+ * @returns 
+ */
+const addScript = async (user_id, name, description, content) => { 
+    
+    const public_id = nanoid(7)
+
+    const [rows] = await pool.query(`
+        INSERT INTO scripts (user_id, public_id, name, description, content)
+        VALUES (?,?,?,?)
+        `, [user_id, name, description, content])
+
+    return json({
+        message: "Script created succesfully",
+        public_id,
+        rowss
+    })
+}
+
+module.exports = { addScript }
