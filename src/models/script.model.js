@@ -15,14 +15,14 @@ const addScript = async (user_id, name, description, content) => {
 
     const [rows] = await pool.query(`
         INSERT INTO scripts (user_id, public_id, name, description, content)
-        VALUES (?,?,?,?)
-        `, [user_id, name, description, content])
+        VALUES (?,?,?,?,?)
+        `, [user_id, public_id, name, description, content])
 
-    return json({
+    return {
         message: "Script created succesfully",
         public_id,
-        rowss
-    })
+        rows
+    }
 }
 
 module.exports = { addScript }

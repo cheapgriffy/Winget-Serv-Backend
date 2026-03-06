@@ -68,8 +68,9 @@ function sendProcessing(content, header = undefined, res, req){
 }
 
 const createScript = async (req, res, next) => {
-    const user_id = res.userId
-    const { name, description, content } = req.body
+    const user_id = req.userId
+    const { name, description } = req.body
+    const content = JSON.stringify(req.body.content)
 
     try{
         if (!name || !description || !content){
@@ -86,6 +87,7 @@ const createScript = async (req, res, next) => {
         }
 
         const script_response = await scriptModel.addScript(user_id, name, description, content)
+        
         res.status(200).json(script_response)
     } catch(err){
         console.log(err)
