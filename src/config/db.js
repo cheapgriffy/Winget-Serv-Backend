@@ -1,9 +1,14 @@
 const mysql = require("mysql2/promise")
 
-// TODO need to had those to a .env
+const db_domain = process.env.db_domain || localhost
+const db_login = process.env.db_login || localhost
+const db_passwd = process.env.db_passwd || ""
+const db_name = process.env.db_name
+
+
 const pool = mysql.createPool({
-    host: "localhost",
-    user: "root",
+    host: db_domain,
+    user: db_login,
     password: "",
     database: "winget_serv"
 })
