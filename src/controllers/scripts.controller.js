@@ -22,6 +22,23 @@ const terminal_output_header = {
 
 
 /**
+ * get script from database based on public id, and send it to process, to be execute
+ * require id param from ./scripts.route.js
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
+const getScriptByPublicId = async (req, res, next) => {
+    try{
+        const script = await scriptModel.getScriptByPublicId(req.params.public_script_id)
+        sendProcessing(script.content, "caution", res, req)
+    } catch(err) {
+        console.log(err)
+        next(err)
+    }
+}
+
+/**
  * Check and convert data to required media
  * @param {raw data to send} content 
  * @param {banner to display in terminal mode} header 
@@ -111,21 +128,16 @@ const createScript = async (req, res, next) => {
     }
 }
 
-/**
- * get script from database based on public id, and send it to process, to be execute
- * require id param from ./scripts.route.js
- * @param {*} req 
- * @param {*} res 
- * @param {*} next 
- */
-const getScriptByPublicId = async (req, res, next) => {
+const removeScript = async (req, res, next) => {
+    const user_id = req.userId
+    const { id } = req.body
     try{
-        const script = await scriptModel.getScriptByPublicId(req.params.public_script_id)
-        sendProcessing(script.content, "caution", res, req)
-    } catch(err) {
+        const response = await scriptModel.removeScript(user_id, id)
+        res.status(200).json(response)
+    } catch(err){
         console.log(err)
         next(err)
     }
 }
 
-module.exports = { sendProcessing, createScript, getScriptByPublicId }
+module.exports = { sendProcessing, createScript, getScriptByPublicId, removeScript }

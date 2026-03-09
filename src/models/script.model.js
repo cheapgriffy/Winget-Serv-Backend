@@ -32,4 +32,12 @@ const getScriptByPublicId = async (public_id) => {
     return rows[0]
 }
 
-module.exports = { addScript, getScriptByPublicId }
+const removeScript = async (user_id, id) => {
+    const [rows] = await pool.query(`
+        DELETE FROM scripts WHERE id = ? AND user_id = ?
+        `, [id, user_id])
+
+    return rows[0]
+}
+
+module.exports = { addScript, getScriptByPublicId, removeScript }
