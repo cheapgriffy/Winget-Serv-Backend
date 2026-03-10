@@ -132,10 +132,11 @@ const createScript = async (req, res, next) => {
 
 const removeScript = async (req, res, next) => {
     const user_id = req.userId
-    const { id } = req.body
+    const { id } = req.body1
     try{
         const current_user = await userModel.getById(user_id)
         const script = await scriptModel.getScriptById(id)
+
 
         if(!script){
             return res.status(404).json({

@@ -8,19 +8,19 @@ app.use(express.json())
 const scriptRoute = require('./src/routes/scripts.route')
 const userRoute = require('./src/routes/user.route')
 const configDB = require('./src/config/db')
+const launchParams = require('./src/config/launch.params').configVariables
 
-
-const PORT = process.env.PORT || 3000
-const HOST = process.env.HOST || "localhost"
 
 
 app.use("/user", userRoute)
 app.use("/script", scriptRoute)
 
 configDB.testDBConnection()
-app.listen(PORT, () => {
+
+app.listen(launchParams.PORT, () => {
     console.log(`
-        Server is listening at http://${HOST}:${PORT}
+        Server is listening at http://${launchParams.HOST}:${launchParams.PORT}
+        
         `)
     }
 )
