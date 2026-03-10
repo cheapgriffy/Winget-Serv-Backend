@@ -1,17 +1,28 @@
+const { config } = require("dotenv");
+
 const args = process.argv.slice(2); 
 
-// Default values
+
+// configVariables is a aimed as a global variable
+// it ensure compatibility between .ENV data and launch parameters data
+// They are prioritized this way
+//? Launch params
+//? IF NONE params => .ENV
+//? IF NONE params and .ENV => Default values
+
 let configVariables = {
     PORT: 3000,
     HOST: "localhost",
 
-    JWT_EXPIRES_IN: "24h",
+    JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || "24h",
 
-    DB_HOST: "localhost",
+    DB_HOST: process.env.DB_HOST || "localhost",
     DB_PORT: 3306,
-    DB_LOGIN: "root",
-    DB_PASSWD: "",
-    DB_NAME: "winget_serv"
+    DB_LOGIN: process.env.DB_LOGIN || "root",
+    DB_PASSWD: process.env.DB_PASSWD || "",
+    DB_NAME: "winget_serv",
+    
+    DB_INIT: false
 }
 
 
@@ -60,10 +71,7 @@ args.forEach(arg => {
             configVariables.PORT = value;
             break;
         case '--init':
-            if(value == true){
-                const configDB = require('../config/db')
-                configDB.initiateDB()
-            }
+            configVariables.INIT_DB = true;
             break;
         case '--token-expires-in':
             configVariables.JWT_EXPIRES_IN = value;
