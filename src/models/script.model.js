@@ -32,6 +32,13 @@ const getScriptByPublicId = async (public_id) => {
     return rows[0]
 }
 
+const getScriptsByUser = async (user_id) => {
+    const [rows] = await pool.query(`
+        SELECT * FROM scripts WHERE user_id = ?
+        `, [user_id])
+        return rows
+}
+
 const getScriptById = async (id) => {
     const [rows] = await pool.query(`
         SELECT * FROM scripts WHERE id = ?
@@ -54,4 +61,4 @@ const removeScript = async (user_id, id) => {
     return rows[0]
 }
 
-module.exports = { addScript, getScriptByPublicId, removeScript, getScriptById }
+module.exports = { addScript, getScriptByPublicId, removeScript, getScriptById, getScriptsByUser }

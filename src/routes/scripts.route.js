@@ -3,11 +3,13 @@ const scriptsController = require("../controllers/scripts.controller")
 const auth = require("../middlewares/auth")
 
 router.post('/create', auth, scriptsController.createScript)
-
 router.delete("/remove", auth, scriptsController.removeScript)
+router.get('/list', auth, scriptsController.getAllUserScipts)
 
-// Works for terminal
+// Works for terminal and web view
 router.get("/:public_script_id", scriptsController.getScriptByPublicId)
+
+
 
 router.get('/:user_id/:script_id', (req, res) => {
 

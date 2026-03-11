@@ -40,6 +40,17 @@ const getScriptByPublicId = async (req, res, next) => {
     }
 }
 
+const getAllUserScipts = async (req, res, next) => {
+    const user_id = req.userId
+    try{
+        const scripts = await scriptModel.getScriptsByUser(user_id)
+        console.log(scripts)
+        res.status(200).json(scripts)
+    } catch(err) {
+        next(err)
+    }
+}
+
 /**
  * Check and convert data to required media
  * @param {raw data to send} content 
@@ -91,7 +102,9 @@ const sendProcessing = async (content, header = undefined, res, req) => {
     if(isTerminal){
         res.send(terminaliffy_send(content, header))
     } else {
-        res.status(200).send(content)
+        let listified_array = ""
+        JSON.parse(content).forEach((e) => {listified_array += e + "<br>"})
+        res.status(200).send(listified_array)
     }
 }
 
@@ -166,4 +179,10 @@ const removeScript = async (req, res, next) => {
     }
 }
 
-module.exports = { sendProcessing, createScript, getScriptByPublicId, removeScript }
+module.exports = { 
+    sendProcessing, 
+    createScript, 
+    getScriptByPublicId, 
+    removeScript, 
+    getAllUserScipts 
+}
