@@ -18,7 +18,7 @@ User receives a link that bundle everything and can be executed from any termina
 
 ``irm http://localhost/script/Jkdèzl || iex``
 
-The whole purpose of this API si to adapt script's to be safely executed on multiple OS and terminal emulators.
+The whole purpose of this API is to adapt script's to be safely executed on multiple OS and terminal emulators.
 
 WIth the posibility of the user to check the script, and have explaination on what's being executed
 
@@ -119,3 +119,4 @@ Change **password** used for database** connection
 #### ``--db-name=``
 
 Change database name used for database connection and creation
+
