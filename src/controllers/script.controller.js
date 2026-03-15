@@ -461,4 +461,5 @@ module.exports = {
     getScript,
     createScript,
     deleteScript,
+    getAllUserScript
 };
