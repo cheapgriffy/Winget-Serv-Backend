@@ -6,7 +6,7 @@ const { requireAuth } = require("../middlewares/auth"); // your existing auth mi
 
 // Using old ahh color escape methodes, cause foreground is only on powershell
 const header_warnings = {
-    execution_reminder: `
+    execution_reminder: `\x1b[33m
     +----------------------------------------+
     |      You're executing a script         |
     |    Virtually everything is possible    |
@@ -15,7 +15,7 @@ const header_warnings = {
     |   You can manually browse the script   |
     |     by puting it on any web browser    |
     +----------------------------------------+
-    `
+    \x1b[0m`
 }
 
 // Don't think this works on normal terminal
@@ -105,7 +105,7 @@ const renderPowerShell = (script) => {
     const header = [
         `# ${script.name}`,
         script.description ? `# ${script.description}` : null,
-        // `Write-Host @"${header_warnings.execution_reminder}"@ -ForegroundColor Yellow`,
+        `echo "${header_warnings.execution_reminder}"`,
         "",
     ]
         .filter((l) => l !== null) //checks for empty script part
