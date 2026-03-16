@@ -20,7 +20,7 @@ One command similar to this one (Powershell example)
 And you're script will be executed.
 
 #### Objectives
-Making script creation more intuitive anc accesible.
+Making script creation more intuitive and accesible.
 Making a such sensitive media more accesible can mean to troubles.
 That's why security measures, and constant reminder of script provider confiance will be bundled in the scripts.
 
