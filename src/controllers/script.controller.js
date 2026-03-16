@@ -7,16 +7,15 @@ const { requireAuth } = require("../middlewares/auth"); // your existing auth mi
 // Using old ahh color escape methodes, cause foreground is only on powershell
 const header_warnings = {
     execution_reminder: `
-    \x1b[33m
-    +----------------------------------------+\n
-    |      You're executing a script         |\n
-    |    Virtually everything is possible    |\n
-    |    Make sure you trust the source      |\n
-    |----------------------------------------|\n
-    |   You can manually browse the script   |\n
-    |     by puting it on any web browser    |\n
-    +----------------------------------------+\n
-    \x1b[0m`
+    +----------------------------------------+
+    |      You're executing a script         |
+    |    Virtually everything is possible    |
+    |    Make sure you trust the source      |
+    |----------------------------------------|
+    |   You can manually browse the script   |
+    |     by puting it on any web browser    |
+    +----------------------------------------+
+    `
 }
 
 // Don't think this works on normal terminal
@@ -58,17 +57,16 @@ Write-Host "Proceeding with installation..." -ForegroundColor Green
  */
 const detectOS = (user_agent = "") => {
     const s = user_agent.toLowerCase();
-    switch (s.includes) {
-        case (s.includes("windows")):
+    
+    switch (true) {
+        case s.includes("windows"):
             return "windows";
-            break;
-        case (s.includes("darwin") || s.includes("mac os")):
+        case s.includes("darwin") || s.includes("mac os"):
             return "macos";
-            break;
         case s.includes("linux"):
             return "linux";
-            break
-        default: return "unknown";
+        default:
+            return "unknown";
     }
 }
 
@@ -79,6 +77,7 @@ const detectOS = (user_agent = "") => {
  */
 function isTerminalClient(user_agent = "") {
     const s = user_agent.toLowerCase();
+    console.log(s)
     return (
         s.includes("curl") ||
         s.includes("wget") ||
@@ -106,7 +105,7 @@ const renderPowerShell = (script) => {
     const header = [
         `# ${script.name}`,
         script.description ? `# ${script.description}` : null,
-        `# ${header_warnings.execution_reminder}`,
+        // `Write-Host @"${header_warnings.execution_reminder}"@ -ForegroundColor Yellow`,
         "",
     ]
         .filter((l) => l !== null) //checks for empty script part
@@ -126,7 +125,7 @@ const renderBash = (script) => {
         "#!/usr/bin/env bash",
         `# ${script.name}`,
         script.description ? `# ${script.description}` : null,
-        header_warnings.execution_reminder,
+        // header_warnings.execution_reminder,
         "set -euo pipefail", //-e stop execussion on error, -u variables that dont exist's are errors, -o make ``cmd1 | cm2`` cmd1 error detectable
         "",
     ]
@@ -341,11 +340,11 @@ const getScript = async (req, res) => {
             return res.status(404).json({ error: "Script not found." });
         }
 
+        // boolean for if client is terminal
         const user_agent = req.headers["user-agent"] || "";
-        // dont forget, null user_agent is bash
         const terminal = isTerminalClient(user_agent);
 
-        // check if os is already present in query. sometime is the case
+        // OS confirmation
         const osOverride = (req.query.os || "").toLowerCase();
         let os = detectOS(user_agent);
         if (osOverride === "win" || osOverride === "windows") os = "windows";
