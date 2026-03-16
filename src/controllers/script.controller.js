@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const ScriptModel = require("../models/script.model");
+const UserModel = require("../models/user.model");
 const { requireAuth } = require("../middlewares/auth"); // your existing auth middleware
 
 // Using old ahh color escape methodes, cause foreground is only on powershell
@@ -431,9 +432,10 @@ const deleteScript = async (req, res) => {
         if (!script) {
             return res.status(404).json({ error: "Script not found." });
         }
-
+        
         // Admins can delete any script; regular users only their own
-        const isAdmin = req.user.role === "admin";
+        const user = await UserModel.getById(req.userId);
+        const isAdmin = user.role_name === "admin";
         if (!isAdmin && script.user_id !== req.userId) {
             return res.status(403).json({ error: "Forbidden." });
         }
