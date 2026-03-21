@@ -10,6 +10,7 @@ const launchParams = require('./src/config/launch.params').configVariables
 const configDB = require('./src/config/db')
 const scriptRoute = require('./src/routes/scripts.route')
 const userRoute = require('./src/routes/user.route')
+const healthRoute = require("./src/routes/health.route")
 
 // Adds headers: Access-Control-Allow-Origin: *
 app.use(cors())
@@ -22,6 +23,7 @@ if (launchParams.INIT_DB == true) {
     });
 }
 
+app.use('/', healthRoute)
 app.use("/user", userRoute)
 app.use("/script", scriptRoute)
 
