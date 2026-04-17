@@ -73,6 +73,11 @@ Under the ``https://{localhost}:{port}/user`` subpage
     "content": "ARRAY"
 }
 ```
+#### **Upload script** ``/script/upload`` *POST*
+**Form-Data file :** ``script``<br>
+*Methodes varies from http client, here a example for curl ``curl -X POST http://localhost:3000/process-file \
+  -F "script=@/chemin/vers/ton/fichier.js"``*
+
 #### **Remove script** ``/script/remove`` *DELETE*<br>
 ```json
 {

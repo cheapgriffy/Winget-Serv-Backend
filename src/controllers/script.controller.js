@@ -394,7 +394,7 @@ const getScript = async (req, res) => {
     }
 };
 
-
+//TODO Script import
 /**
  * POST /script/create
  * Body: { name, description?, content: string[] }
@@ -402,7 +402,9 @@ const getScript = async (req, res) => {
  */
 const createScript = async (req, res) => {
     const { name, description, content } = req.body;
+    const isFile = req.query.raw === 'true';
 
+    // body checks
     if (!name || typeof name !== "string") {
         return res.status(400).json({ error: "Field 'name' is required." });
     }
@@ -418,6 +420,7 @@ const createScript = async (req, res) => {
     }
 
     try {
+        // send to model
         const script = await ScriptModel.create({
             name: name.trim(),
             description: description?.trim() || null,
@@ -431,6 +434,39 @@ const createScript = async (req, res) => {
         res.status(500).json({ error: "Internal server error." });
     }
 };
+
+/**
+ * Convert file to array to be sent to DDB
+ * @param {object} req sent by user 
+ * @param {object} res sended to used
+ */
+const uploadScript = async (req, res) => {
+    const fileData = req.file.buffer;
+    const textContent = fileData.toString('utf-8');
+
+    const textArray = textContent.split("\r\n")
+
+    try{
+        const sentScript = await ScriptModel.create({
+            name: req.file.originalname,
+            description: null,
+            content: textArray,
+            user_id: req.userId
+        })
+
+        res.status(201).send({
+            message: "File succesfully imported",
+            sentScript
+        })
+
+    } catch(err) {
+        next(err)
+        res.status(500).send({
+            error: "Internal Server Error",
+            message: "Something went wrong in the uploading of your file"
+        })
+    }
+}
 
 
 /**
@@ -486,5 +522,6 @@ module.exports = {
     getScript,
     createScript,
     deleteScript,
-    getAllUserScript
+    getAllUserScript,
+    uploadScript
 };
