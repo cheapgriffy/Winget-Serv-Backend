@@ -394,7 +394,7 @@ const getScript = async (req, res) => {
     }
 };
 
-
+//TODO Script import
 /**
  * POST /script/create
  * Body: { name, description?, content: string[] }
@@ -402,7 +402,9 @@ const getScript = async (req, res) => {
  */
 const createScript = async (req, res) => {
     const { name, description, content } = req.body;
+    const isFile = req.query.raw === 'true';
 
+    // body checks
     if (!name || typeof name !== "string") {
         return res.status(400).json({ error: "Field 'name' is required." });
     }
@@ -418,6 +420,7 @@ const createScript = async (req, res) => {
     }
 
     try {
+        // send to model
         const script = await ScriptModel.create({
             name: name.trim(),
             description: description?.trim() || null,
@@ -431,6 +434,47 @@ const createScript = async (req, res) => {
         res.status(500).json({ error: "Internal server error." });
     }
 };
+
+/**
+ * Convert file to array to be sent to DDB
+ * @param {object} req sent by user 
+ * @param {object} res sended to used
+ */
+const uploadScript = async (req, res, next) => {    
+    try {
+        if (!req.file || !req.file.buffer) {
+            return res.status(400).json({ error: "No file uploaded" });
+        }
+
+        if (req.file.buffer.length === 0) {
+            return res.status(400).json({ error: "File must not be empty" });
+        }
+
+        const textContent = req.file.buffer.toString('utf-8');
+        const textArray = textContent.split(/\r?\n/);
+
+
+        const sentScript = await ScriptModel.create({
+            name: req.file.originalname,
+            description: null,
+            content: textArray,
+            user_id: req.userId
+        })
+
+        res.status(201).send({
+            message: "File succesfully imported",
+            sentScript
+        })
+
+    } catch(err) {
+        console.log(err)
+        next(err)
+        res.status(500).send({
+            error: "Internal Server Error",
+            message: "Something went wrong in the uploading of your file"
+        })
+    }
+}
 
 
 /**
@@ -486,5 +530,6 @@ module.exports = {
     getScript,
     createScript,
     deleteScript,
-    getAllUserScript
+    getAllUserScript,
+    uploadScript
 };

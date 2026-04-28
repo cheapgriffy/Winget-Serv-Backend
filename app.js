@@ -1,5 +1,6 @@
 require('dotenv').config()
 
+// Frameworks
 const express = require('express')
 const app = express()
 const cors = require("cors")
@@ -8,7 +9,7 @@ const rateLimit = require('express-rate-limit')
 
 app.use(express.json())
 
-
+// Files calls
 const launchParams = require('./src/config/launch.params').configVariables
 const configDB = require('./src/config/db')
 const scriptRoute = require('./src/routes/scripts.route')
@@ -36,6 +37,7 @@ const limiter = rateLimit({
 app.use(cors())
 // set on all routes
 app.use(limiter)
+
 
 app.use('/', healthRoute)
 app.use("/user", userRoute)
