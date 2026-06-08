@@ -53,7 +53,7 @@ Write-Host " Proceeding with installation... " -ForegroundColor Green
 // ---------------------------------------------------------------------------
 
 /**
- * Filter out user agent to get current OS
+ * get current OS from user agent.
  * @param {string} user_agent  - req.headers['user-agent']
  * @returns {"windows"|"linux"|"macos"|"unknown"}
  */

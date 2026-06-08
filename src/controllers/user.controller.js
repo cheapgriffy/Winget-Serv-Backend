@@ -96,11 +96,9 @@ const login = async (req, res, next) => {
                 message: "A username or email and password is required"
             })
         }
-
         // get user from db by username or email
         const user = await userModel.getByUsername(user_info.username) || await userModel.getByEmail(user_info.email)
 
-        
         if(!user){
             return res.status(404).json({
                 error: "Creditential",
