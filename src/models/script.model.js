@@ -129,8 +129,8 @@ const parseContent = (raw) => {
 const generatePublicId = (size = 8) => {
     return Math.random()                    // generate float
         .toString(36)                       // Change counting base, from base10 to base-36
-            .substring(2, size + 2)         // Remove "0." from stringed float, and stop after 10 char //? (10 -2 => 8 char total)
-                .toUpperCase();             // Easier to look at
+        .substring(2, size + 2)         // Remove "0." from stringed float, and stop after 10 char //? (10 -2 => 8 char total)
+        .toUpperCase();             // Easier to look at
 }
 
 module.exports = {
@@ -138,5 +138,7 @@ module.exports = {
     findById,
     findAllByUser,
     create,
-    remove
+    remove,
+    parseContent,
+    generatePublicId
 };

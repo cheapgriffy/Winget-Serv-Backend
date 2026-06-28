@@ -60,7 +60,7 @@ Write-Host " Proceeding with installation... " -ForegroundColor Green
  */
 const detectOS = (user_agent = "") => {
     const s = user_agent.toLowerCase();
-    
+
     switch (true) {
         case s.includes("windows"):
             return "windows";
@@ -331,7 +331,7 @@ const resDownload = (script, res) => {
     let output = ''
 
     script.content.forEach((e, i) => {
-        script.content.length -1 == i  ? output += e : output += e + "\n"
+        script.content.length - 1 == i ? output += e : output += e + "\n"
     });
 
     res.attachment(script.public_id + ".ps1")
@@ -386,7 +386,7 @@ const getScript = async (req, res) => {
         res.setHeader("Content-Type", "text/html; charset=utf-8");
 
         // check if needed to be downloaded from ?raw slug
-        return isRaw === false || undefined ? res.send(renderHTML(script, publicUrl)) : resDownload(script, res) ;
+        return isRaw === false || undefined ? res.send(renderHTML(script, publicUrl)) : resDownload(script, res);
 
     } catch (err) {
         console.error("[script.controller] GET /:public_id", err);
@@ -440,7 +440,7 @@ const createScript = async (req, res) => {
  * @param {object} req sent by user 
  * @param {object} res sended to used
  */
-const uploadScript = async (req, res, next) => {    
+const uploadScript = async (req, res, next) => {
     try {
         if (!req.file || !req.file.buffer) {
             return res.status(400).json({ error: "No file uploaded" });
@@ -466,7 +466,7 @@ const uploadScript = async (req, res, next) => {
             sentScript
         })
 
-    } catch(err) {
+    } catch (err) {
         console.log(err)
         next(err)
         res.status(500).send({
@@ -495,7 +495,7 @@ const deleteScript = async (req, res) => {
         if (!script) {
             return res.status(404).json({ error: "Script not found." });
         }
-        
+
         // Admins can delete any script; regular users only their own
         const user = await UserModel.getById(req.userId);
         const isAdmin = user.role_name === "admin";
@@ -531,5 +531,12 @@ module.exports = {
     createScript,
     deleteScript,
     getAllUserScript,
-    uploadScript
+    uploadScript,
+    detectOS,
+    isTerminalClient,
+    renderPowerShell,
+    renderBash,
+    renderHTML,
+    escapeHtml,
+    resDownload
 };
