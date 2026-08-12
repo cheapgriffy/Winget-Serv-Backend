@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const ScriptModel = require("../models/script.model");
 const UserModel = require("../models/user.model");
+const e = require("express");
 
 // Using old ahh color escape methodes, cause foreground is only on powershell
 const header_warnings = {
@@ -59,7 +60,7 @@ Write-Host " Proceeding with installation... " -ForegroundColor Green
  */
 const detectOS = (user_agent = "") => {
     const s = user_agent.toLowerCase();
-    
+
     switch (true) {
         case s.includes("windows"):
             return "windows";
@@ -322,16 +323,33 @@ const escapeHtml = (str = "") => {
 
 
 /**
+ * res as a downloadable script
+ * @param {Object} script will use script.content mainly 
+ * @param {oject} res Express res object 
+ */
+const resDownload = (script, res) => {
+    let output = ''
+
+    script.content.forEach((e, i) => {
+        script.content.length - 1 == i ? output += e : output += e + "\n"
+    });
+
+    res.attachment(script.public_id + ".ps1")
+    res.send(output)
+}
+
+/**
  * GET /script/:public_id
  *
- * - Terminal client  → returns raw script (PS1 or SH) based on User-Agent or ?os=
- * - Browser client   → returns HTML preview page
+ * - Terminal client  => returns raw script (PS1 or SH) based on User-Agent or ?os=
+ * - Browser client   => returns HTML preview page
  *
  * Optional query param: ?os=win|linux|macos  (overrides UA detection)
  */
 const getScript = async (req, res) => {
     try {
         const script = await ScriptModel.findByPublicId(req.params.public_id);
+        const isRaw = req.query.raw === 'true';
 
         if (!script) {
             return res.status(404).json({ error: "Script not found." });
@@ -348,6 +366,7 @@ const getScript = async (req, res) => {
         else if (osOverride === "linux") os = "linux";
         else if (osOverride === "mac" || osOverride === "macos") os = "macos";
 
+        // Set safety header based on Useragent displayed OS
         if (terminal || osOverride) {
             // --- Raw script delivery ---
             if (os === "windows") {
@@ -365,7 +384,9 @@ const getScript = async (req, res) => {
         const baseUrl = `${req.protocol}://${req.get("host")}`;
         const publicUrl = `${baseUrl}/script/${script.public_id}`;
         res.setHeader("Content-Type", "text/html; charset=utf-8");
-        return res.send(renderHTML(script, publicUrl));
+
+        // check if needed to be downloaded from ?raw slug
+        return isRaw === false || undefined ? res.send(renderHTML(script, publicUrl)) : resDownload(script, res);
 
     } catch (err) {
         console.error("[script.controller] GET /:public_id", err);
@@ -373,7 +394,7 @@ const getScript = async (req, res) => {
     }
 };
 
-
+//TODO Script import
 /**
  * POST /script/create
  * Body: { name, description?, content: string[] }
@@ -381,7 +402,9 @@ const getScript = async (req, res) => {
  */
 const createScript = async (req, res) => {
     const { name, description, content } = req.body;
+    const isFile = req.query.raw === 'true';
 
+    // body checks
     if (!name || typeof name !== "string") {
         return res.status(400).json({ error: "Field 'name' is required." });
     }
@@ -397,6 +420,7 @@ const createScript = async (req, res) => {
     }
 
     try {
+        // send to model
         const script = await ScriptModel.create({
             name: name.trim(),
             description: description?.trim() || null,
@@ -410,6 +434,47 @@ const createScript = async (req, res) => {
         res.status(500).json({ error: "Internal server error." });
     }
 };
+
+/**
+ * Convert file to array to be sent to DDB
+ * @param {object} req sent by user 
+ * @param {object} res sended to used
+ */
+const uploadScript = async (req, res, next) => {
+    try {
+        if (!req.file || !req.file.buffer) {
+            return res.status(400).json({ error: "No file uploaded" });
+        }
+
+        if (req.file.buffer.length === 0) {
+            return res.status(400).json({ error: "File must not be empty" });
+        }
+
+        const textContent = req.file.buffer.toString('utf-8');
+        const textArray = textContent.split(/\r?\n/);
+
+
+        const sentScript = await ScriptModel.create({
+            name: req.file.originalname,
+            description: null,
+            content: textArray,
+            user_id: req.userId
+        })
+
+        res.status(201).send({
+            message: "File succesfully imported",
+            sentScript
+        })
+
+    } catch (err) {
+        console.log(err)
+        next(err)
+        res.status(500).send({
+            error: "Internal Server Error",
+            message: "Something went wrong in the uploading of your file"
+        })
+    }
+}
 
 
 /**
@@ -430,7 +495,7 @@ const deleteScript = async (req, res) => {
         if (!script) {
             return res.status(404).json({ error: "Script not found." });
         }
-        
+
         // Admins can delete any script; regular users only their own
         const user = await UserModel.getById(req.userId);
         const isAdmin = user.role_name === "admin";
@@ -465,5 +530,13 @@ module.exports = {
     getScript,
     createScript,
     deleteScript,
-    getAllUserScript
+    getAllUserScript,
+    uploadScript,
+    detectOS,
+    isTerminalClient,
+    renderPowerShell,
+    renderBash,
+    renderHTML,
+    escapeHtml,
+    resDownload
 };

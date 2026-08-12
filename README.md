@@ -1,8 +1,7 @@
-# Winget-Serv [WIP]
-
-## Introduction
+<img width="420" height="180" alt="PIpeline_server_variant" src="https://github.com/user-attachments/assets/2e49eabb-592e-428f-913d-238b3f14682a" />
 
 ### A custom script link creation tool.
+> Basically a pretext to use ninite like scripts with one command
 
 #### What it does
 - Create scripts from a Graphical Interface
@@ -73,6 +72,11 @@ Under the ``https://{localhost}:{port}/user`` subpage
     "content": "ARRAY"
 }
 ```
+#### **Upload script** ``/script/upload`` *POST*
+**Form-Data file :** ``script``<br>
+*Methodes varies from http client, here a example for curl ``curl -X POST http://localhost:3000/process-file \
+  -F "script=@/chemin/vers/ton/fichier.js"``*
+
 #### **Remove script** ``/script/remove`` *DELETE*<br>
 ```json
 {
@@ -81,7 +85,8 @@ Under the ``https://{localhost}:{port}/user`` subpage
 ```
 
 #### **Execute / View script** *(on browser)* *GET*
-``/script/:public_id`` 
+``/script/:public_id`` <br>
+*optional ``?raw=true`` to download raw script content*<br>
 *Generally 8 chars*
 
 #### **Get all script from user** *GET*
