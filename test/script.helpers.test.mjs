@@ -6,21 +6,21 @@ import scriptController from '../src/controllers/script.controller.js'
 
 const { detectOS, isTerminalClient, renderBash, renderPowerShell, escapeHtml } = scriptController
 
-// detectOS: ensure basic user-agent parsing works for major OS values.
+// detectOS output check
 test('detectOS recognizes windows, macos, linux and unknown', () => {
     expect(detectOS('Mozilla/5.0 (Windows NT 10.0; Win64; x64)')).toBe('windows')
     expect(detectOS('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)')).toBe('macos')
     expect(detectOS('Mozilla/5.0 (X11; Linux x86_64)')).toBe('linux')
-    expect(detectOS('Some-Random-Agent')).toBe('unknown')
+    expect(detectOS('Netscape type shit')).toBe('unknown')
 })
 
-// isTerminalClient: terminal UAs should be detected, browsers should not.
+
 test('isTerminalClient detects common terminal UAs', () => {
     expect(isTerminalClient('curl/7.64.1')).toBe(true)
     expect(isTerminalClient('Mozilla/5.0 (Windows NT 10.0; Win64; x64)')).toBe(false)
 })
 
-// Renderers: ensure script name and contents are included in output.
+// check bash "header" injection | array to powershell output
 test('renderBash and renderPowerShell include script name and content', () => {
     const script = { name: 'MyScript', description: 'desc', content: ['echo hi', 'echo bye'] }
     const bash = renderBash(script)
@@ -34,7 +34,7 @@ test('renderBash and renderPowerShell include script name and content', () => {
     expect(ps).toContain('echo hi')
 })
 
-// escapeHtml: verify basic escaping for special characters.
+// webview xss protection check
 test('escapeHtml escapes special characters', () => {
     const raw = "<div>\"&'</div>"
     const out = escapeHtml(raw)
