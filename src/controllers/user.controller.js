@@ -85,8 +85,13 @@ const getById = async (req, res, next) => {
         const id = Number(req.params.id)
 
         const user = await userModel.getById(id)
+        user.hashed_password = undefined
+        // TODO Edit when email is acually used in app
+        user.email = undefined
+
         return res.status(200).json({user})
     }catch(err){
+        console.log(err)
         next()
     }
 }
@@ -142,6 +147,8 @@ const login = async (req, res, next) => {
 const getMe = async (req, res, next) => {
     try{
         const user = await userModel.getById(req.userId)
+        // already checked in auth middleware, no user need to be retreived
+        user.hashed_password = undefined
         return res.status(200).json({user})
     }catch(err){
         console.log(err)
