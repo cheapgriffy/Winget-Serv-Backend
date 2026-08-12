@@ -80,6 +80,10 @@ const removeUser = async (req, res, next) => {
     }
 }
 
+/**
+ * Fetch filtered info from users
+ * @returns {id, name, role_id, role_name, created_at}
+ */
 const getById = async (req, res, next) => {
     try{
         const id = Number(req.params.id)
@@ -142,11 +146,47 @@ const login = async (req, res, next) => {
     }
 }
 
+const updatePassword = async (req, res, next) => {
+    try{
+        const body = { old_password, new_password } = req.body
+        const user = await userModel.getById(req.userId)
+
+        if(!body.old_password || !body.new_password){
+            res.status(401).json({
+                error: "Bad Request",
+                message: "The old and new password is required"
+            })
+        }
+
+        const is_valid_password = await bcrypt.compare(body.old_password, user.hashed_password)
+
+        if(!is_valid_password){
+            return res.status(401).json({
+                error: "Bad Request",
+                message: "The old password is incorrect"
+            })
+        }
+
+        // would throw if not valid
+        const ispasswordUpdated = await userModel.updatePassword(req.userId, body.new_password)
+
+        return res.status(200).json({
+            message: "Password updated succesfully"
+        })
+
+    } catch(err){
+        console.log(err)
+        next(err)
+    }
+}
+
+/**
+ * Fetch full info from DB about the user that is currently logged in
+ * @returns {id, name, email, hashed_password, role_id, role_name, created_at}
+ */
 const getMe = async (req, res, next) => {
     try{
         const user = await userModel.getById(req.userId)
-        // already checked in auth middleware, no user need to be retreived
-        user.hashed_password = undefined
         return res.status(200).json({user})
     }catch(err){
         console.log(err)
@@ -154,4 +194,4 @@ const getMe = async (req, res, next) => {
     }
 }
 
-module.exports = { createUser, removeUser, getById, login, getMe }
+module.exports = { createUser, removeUser, getById, login, getMe, updatePassword }
