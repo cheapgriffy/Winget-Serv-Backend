@@ -368,15 +368,24 @@ const getScript = async (req, res) => {
 
         // Set safety header based on Useragent displayed OS
         if (terminal || osOverride) {
-            // --- Raw script delivery ---
-            if (os === "windows") {
-                res.setHeader("Content-Type", "text/plain; charset=utf-8");
-                return res.send(renderPowerShell(script));
-            } else {
-                // linux, macos, unknown → bash
-                res.setHeader("Content-Type", "text/plain; charset=utf-8");
-                return res.send(renderBash(script));
+            switch (os) {
+                case "windows":
+                    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+                    return res.send(renderPowerShell(script));
+                    break;
+                case "linux":
+                    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+                    res.send(renderBash(script));
+                    break;
+                case "macos":
+                    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+                    return res.send(renderBash(script));
+                    break;
+                default:
+                    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+                    return res.send(renderBash(script));
             }
+
         }
 
         // Browser preview. mandatory shenanigans for testing (in http environement)
@@ -394,7 +403,6 @@ const getScript = async (req, res) => {
     }
 };
 
-//TODO Script import
 /**
  * POST /script/create
  * Body: { name, description?, content: string[] }

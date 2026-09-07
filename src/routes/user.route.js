@@ -9,6 +9,7 @@ router.delete("/remove", auth, userController.removeUser)
 router.get("/:id", auth, userController.getById)
 router.post("/login", userController.login)
 router.get("/me", auth, userController.getMe)
+router.patch("/password", auth, userController.updatePassword)
 
 
 module.exports = router;

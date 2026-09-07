@@ -13,7 +13,7 @@ const createUser = async (name, email, hashed_password) => {
         VALUES (?,?,?)
         `, [name, email, hashed_password])
 
-        return rows
+    return rows
 }
 
 const removeById = async (id) => {
@@ -52,9 +52,15 @@ const getById = async (id) => {
         LEFT JOIN roles ON u.role_id = roles.id
         WHERE u.id = ?
         `, [id])
-        
+
     return rows[0]
 }
 
+const updatePassword = async (id, new_hashed_password) => {
+    const [rows] = await pool.query(`
+        UPDATE users SET hashed_password = ? WHERE id = ?
+        `, [new_hashed_password, id])
+    return rows[0]
+}
 
-module.exports = { createUser, getByUsername, removeById, getById, getByEmail }
+module.exports = { createUser, getByUsername, removeById, getById, getByEmail, updatePassword }
