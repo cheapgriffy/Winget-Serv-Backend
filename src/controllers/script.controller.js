@@ -48,6 +48,40 @@ Confirm-Continue -Message "This script will install applications on your system.
 Write-Host " Proceeding with installation... " -ForegroundColor Green
 `
 
+const bash_prompt_template = `
+confirm_continue() {
+    local message="\${1:-Do you want to continue?}"
+
+    while true; do
+        read -rp "$message [Y/n] " input < /dev/tty
+        input="$(echo "$input" | tr '[:upper:]' '[:lower:]' | xargs)"
+
+        case "$input" in
+            y|"")
+                return 0
+                ;;
+            n)
+                echo -e "\\e[33mOperation cancelled.\\e[0m"
+                read -n 1 -s -r -p "Press any key to continue..."
+                echo
+                exit 0
+                ;;
+            *)
+                echo -e "\\e[31mInvalid input. Please enter Y or N.\\e[0m"
+                ;;
+        esac
+    done
+}
+
+confirm_continue "This script will install applications on your system."
+echo -e "\\e[32mProceeding with installation...\\e[0m"
+`
+
+const executable_extensions = {
+    windows: ["ps1", "bat", "cmd"],
+    linux: ["sh", "bash"],
+}
+
 
 // ---------------------------------------------------------------------------
 // OS detection helpers
@@ -126,7 +160,7 @@ const renderBash = (script) => {
         "#!/usr/bin/env bash",
         `# ${script.name}`,
         script.description ? `# ${script.description}` : null,
-        // header_warnings.execution_reminder,
+        `echo "${header_warnings.execution_reminder}"`,
         "set -euo pipefail", //-e stop execussion on error, -u variables that dont exist's are errors, -o make ``cmd1 | cm2`` cmd1 error detectable
         "",
     ]
@@ -134,7 +168,7 @@ const renderBash = (script) => {
         .join("\n"); //strinfigy
 
     const body = script.content.join("\n");
-    return `${header}${body}\n`;
+    return `${header}${bash_prompt_template}${body}\n`;
 }
 
 //TODO webUI is Claude made. Make it yourself dummy
@@ -409,7 +443,7 @@ const getScript = async (req, res) => {
  * Requires authentication.
  */
 const createScript = async (req, res) => {
-    const { name, description, content } = req.body;
+    const { name, description, content, operating_system } = req.body;
     const isFile = req.query.raw === 'true';
 
     // body checks
@@ -433,6 +467,7 @@ const createScript = async (req, res) => {
             name: name.trim(),
             description: description?.trim() || null,
             content,
+            operating_system: operating_system?.trim() || "unknown",
             user_id: req.userId, // set by requireAuth middleware
         });
 
@@ -458,6 +493,18 @@ const uploadScript = async (req, res, next) => {
             return res.status(400).json({ error: "File must not be empty" });
         }
 
+
+        let fileExtension = req.file.originalname.split('.').pop().toLowerCase();
+        let extrapolatedOS = null
+
+        // define OS based on file extention, to be tagged in DB, unknown is DB default based
+        if (executable_extensions.windows.includes(fileExtension)) {
+            extrapolatedOS = "windows";
+        } else if (executable_extensions.linux.includes(fileExtension)) {
+         
+            extrapolatedOS = "linux";
+        }
+
         const textContent = req.file.buffer.toString('utf-8');
         const textArray = textContent.split(/\r?\n/);
 
@@ -466,6 +513,7 @@ const uploadScript = async (req, res, next) => {
             name: req.file.originalname,
             description: null,
             content: textArray,
+            operating_system: extrapolatedOS || "unknown",
             user_id: req.userId
         })
 
@@ -475,8 +523,8 @@ const uploadScript = async (req, res, next) => {
         })
 
     } catch (err) {
-        console.log(err)
-        next(err)
+        console.error("[script.controller] POST /upload", err);
+        next(err);
         res.status(500).send({
             error: "Internal Server Error",
             message: "Something went wrong in the uploading of your file"

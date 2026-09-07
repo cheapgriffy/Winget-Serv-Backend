@@ -69,13 +69,15 @@ Under the ``https://{localhost}:{port}/user`` subpage
 {
     "name": "string",
     "description": "string, can be null",       // require authentification
-    "content": "ARRAY"
+    "content": "ARRAY",
+    "operating_system": "nulled string will be undefined/linux default"   // require authentification
 }
 ```
 #### **Upload script** ``/script/upload`` *POST*
 **Form-Data file :** ``script``<br>
 *Methodes varies from http client, here a example for curl ``curl -X POST http://localhost:3000/process-file \
   -F "script=@/chemin/vers/ton/fichier.js"``*
+  opearting_system will be extrapolated from file extension, if not found it will be set to "unknown"
 
 #### **Remove script** ``/script/remove`` *DELETE*<br>
 ```json
