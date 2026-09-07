@@ -3,23 +3,31 @@
 ### A custom script link creation tool.
 > Basically a pretext to use ninite like scripts with one command
 
-#### What it does
-- Create scripts from a Graphical Interface
-- Make your script accesible from a link
-- Execute it from wherever you like with one command
+### What it does
+- Save or host scripts
+- Serves scripts on a link
+- Use the links for remote script acces
 
-#### Why should I need it
-One link, and you're ready.
-Weither its for quick computer setup, or keeping quickly seting up your student workspaces.
-One command similar to this one (Powershell example)
-``irm https://<link>/script/Jkdèzl || iex``
+### How does it work ?
+It saves your uploaded script in a database, and generate links containing its content.
 
-And you're script will be executed.
+Then you can use the link as a web shortcut to execute what you planned.
 
-#### Objectives
-Making script creation more intuitive and accesible.
-Making a such sensitive media more accesible can mean to troubles.
-That's why security measures, and constant reminder of script provider confiance will be bundled in the scripts.
+It host, then you execute with your shell by piping it.
+
+#### Examples :
+Powershell :
+``irm https://script.cheapgriffy.com/api/script/B50VTRV4 | iex``
+
+Bash : 
+``curl -fsSL https://script.cheapgriffy.com/api/script/B50VTRV4 | bash``
+
+#### Why ? 
+It removes friction when making remote script links,
+
+I was tired of pushing scripts to github and then using raw links, or using pastebin, so I made this.
+
+I mainly use those for installation scripts, or to summarise unintuitive commands. If you ever had to setup wsl port foward you know what im talking about.
 
 ---
 ## API Usage
