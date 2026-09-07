@@ -77,6 +77,11 @@ confirm_continue "This script will install applications on your system."
 echo -e "\\e[32mProceeding with installation...\\e[0m"
 `
 
+const executable_extensions = {
+    windows: ["ps1", "bat", "cmd"],
+    linux: ["sh", "bash"],
+}
+
 
 // ---------------------------------------------------------------------------
 // OS detection helpers
@@ -488,6 +493,18 @@ const uploadScript = async (req, res, next) => {
             return res.status(400).json({ error: "File must not be empty" });
         }
 
+
+        let fileExtension = req.file.originalname.split('.').pop().toLowerCase();
+        let extrapolatedOS = null
+
+        // define OS based on file extention, to be tagged in DB, unknown is DB default based
+        if (executable_extensions.windows.includes(fileExtension)) {
+            extrapolatedOS = "windows";
+        } else if (executable_extensions.linux.includes(fileExtension)) {
+         
+            extrapolatedOS = "linux";
+        }
+
         const textContent = req.file.buffer.toString('utf-8');
         const textArray = textContent.split(/\r?\n/);
 
@@ -496,6 +513,7 @@ const uploadScript = async (req, res, next) => {
             name: req.file.originalname,
             description: null,
             content: textArray,
+            operating_system: extrapolatedOS || "unknown",
             user_id: req.userId
         })
 
@@ -505,8 +523,8 @@ const uploadScript = async (req, res, next) => {
         })
 
     } catch (err) {
-        console.log(err)
-        next(err)
+        console.error("[script.controller] POST /upload", err);
+        next(err);
         res.status(500).send({
             error: "Internal Server Error",
             message: "Something went wrong in the uploading of your file"

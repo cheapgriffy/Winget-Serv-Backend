@@ -38,7 +38,7 @@ const findByPublicId = async (publicId) => {
  */
 const findById = async (id) => {
     const [rows] = await db.pool.query(
-        `SELECT id, public_id, name, description, content, user_id 
+        `SELECT id, public_id, name, description, content, user_id, operating_system
         FROM scripts 
         WHERE id = ? 
         LIMIT 1`,
@@ -75,16 +75,16 @@ const findAllByUser = async (userId) => {
 
 /**
  * Create a new script in Database
- * @param {{ name: string, description?: string, content: string[], user_id: number }} data
+ * @param {{ name: string, description?: string, content: string[], user_id: number, operating_system: string }} data
  * @returns {Promise<Script>}
  */
-const create = async ({ name, description = null, content, user_id }) => {
+const create = async ({ name, description = null, content, user_id, operating_system }) => {
     const publicId = generatePublicId();
     const contentJson = JSON.stringify(content);
 
     const [result] = await db.pool.query(
-        "INSERT INTO scripts (public_id, name, description, content, user_id) VALUES (?, ?, ?, ?, ?)",
-        [publicId, name, description, contentJson, user_id]
+        "INSERT INTO scripts (public_id, name, description, content, user_id, operating_system) VALUES (?, ?, ?, ?, ?, ?)",
+        [publicId, name, description, contentJson, user_id, operating_system]
     );
 
     return findById(result.insertId);
