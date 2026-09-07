@@ -59,7 +59,7 @@ const findById = async (id) => {
  */
 const findAllByUser = async (userId) => {
     const [rows] = await db.pool.query(
-        `SELECT id, public_id, name, description, content, user_id 
+        `SELECT id, public_id, name, description, content, user_id, operating_system
         FROM scripts 
         WHERE user_id = ?`,
         [userId]
