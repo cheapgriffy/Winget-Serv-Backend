@@ -81,9 +81,10 @@ const initiateDB = async () => {
             CREATE TABLE IF NOT EXISTS scripts(
                 id INT PRIMARY KEY AUTO_INCREMENT,
                 public_id VARCHAR(255) NOT NULL UNIQUE,
-                name VARCHAR(255) NOT NULL,
+                name VARCHAR(255) NOT NULL DEFAULT 'unknown',
                 description TEXT,
                 content JSON NOT NULL,
+                operating_system VARCHAR(255) NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 user_id INT NOT NULL,
